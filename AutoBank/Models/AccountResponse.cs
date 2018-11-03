@@ -6,19 +6,6 @@ using System.Web;
 
 namespace Autobank.Models
 {
-    public class AccountEntity
-    {
-       
-        public int Id { get; set; }
-        public string AccountName { get; set; }
-
-        public int AccountNumber { get; set; }
-
-        public decimal Balance { get; set; }
-
-        public string Currency { get; set; }
-    }
-
 
     public class AccountResponse
     {

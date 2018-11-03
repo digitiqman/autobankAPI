@@ -27,8 +27,10 @@ namespace Autobank.Models
 
         public DbSet<AccountModel> Account { get; set; }     
 
+        //public ApplicationDbContext()
+        //    : base("DefaultConnection", throwIfV1Schema: false)
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("DBConnectionString", throwIfV1Schema: false)
         {
         }
 

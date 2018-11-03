@@ -344,8 +344,13 @@
     </Compile>
     <Compile Include="Helpers\AccountException.cs" />
     <Compile Include="Helpers\LogWriter.cs" />
-    <Compile Include="Models\AccountDto.cs" />
-    <Compile Include="Models\AccountEntity.cs" />
+    <Compile Include="Migrations\201811022353037_OptmisticConcurr.cs" />
+    <Compile Include="Migrations\201811022353037_OptmisticConcurr.Designer.cs">
+      <DependentUpon>201811022353037_OptmisticConcurr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\AccountRequest.cs" />
+    <Compile Include="Models\AccountResponse.cs" />
     <Compile Include="Models\AccountModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -417,6 +422,11 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201811022353037_OptmisticConcurr.resx">
+      <DependentUpon>201811022353037_OptmisticConcurr.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

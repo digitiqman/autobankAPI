@@ -13,6 +13,7 @@ using System.Web.Mvc;
 using AutoBank.Helpers;
 using Autobank.Models;
 using Newtonsoft.Json;
+using AutoBank.Models;
 
 namespace Autobank.Controllers
 {
@@ -24,8 +25,8 @@ namespace Autobank.Controllers
 
         [System.Web.Http.HttpGet]
         [ResponseType(typeof(AccountResponse))]
-        [System.Web.Http.Route("Getbalance/{accountNumber}")]
-        public IHttpActionResult GetBalance(int accountNumber)
+        [System.Web.Http.Route("balance/{accountNumber}")]
+        public IHttpActionResult Balance(int accountNumber)
         {
 
             try
@@ -67,18 +68,49 @@ namespace Autobank.Controllers
 
         }
 
-        //[HttpPost]
-        //[ResponseType(typeof(AccountModel))]
-        //public async Task<IHttpActionResult> Deposit(int id)
-        //{
-        //    AccountModel accountDto = await db.Account.FindAsync(id);
-        //    if (accountDto == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [System.Web.Http.HttpPost]
+        [ResponseType(typeof(AccountResponse))]
+        public IHttpActionResult Deposit(AccountRequest accountData)
+        {
 
-        //    return Ok(accountDto);
-        //}
+            AccountModel accountDetails = db.Account.Where(a => a.AccountNumber == accountData.AccountNumber).FirstOrDefault();
+            try
+            {                
+                if (accountDetails == null)
+                {
+                    throw new AccountException("Invalid Account Number");
+                }
+                AccountResponse resp = accountDetails.Deposit(accountData);
+                AccountResponse response = new AccountResponse
+                {
+                    AccountNumber = accountDetails.AccountNumber,
+                    Successful = true,
+                    Balance = accountDetails.Balance,
+                    Currency = accountDetails.Currency,
+                    Message = "Account Details Retrieved Successfully."
+                };
+
+                return Ok(response);
+
+            }
+            catch (AccountException ae)
+            {
+
+                AccountResponse response = new AccountResponse
+                {
+                    AccountNumber = accountData.AccountNumber,
+                    Successful = false,
+                    Message = ae.Message
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError();
+            }
+
+        }
 
         //[HttpPost]
         //[ResponseType(typeof(void))]
