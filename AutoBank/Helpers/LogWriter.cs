@@ -12,11 +12,11 @@ namespace AutoBank.Helpers
             try
             {
 
-                String path = HttpContext.Current.Server.MapPath("~/Log");
+                String path = HttpContext.Current.Server.MapPath("~/Logs");
                 DateTime t = DateTime.Now;
                 System.Text.StringBuilder fileNameBuilder = new System.Text.StringBuilder();
 
-                fileNameBuilder.Append(t.Year).Append("_").Append(t.Month).Append("_").Append(t.Day).Append(".txt");
+                fileNameBuilder.Append("Chilindo_AutoBank").Append(t.Year).Append("_").Append(t.Month).Append("_").Append(t.Day).Append(".txt");
                 path = System.IO.Path.Combine(path, fileNameBuilder.ToString());
 
                 using (System.IO.StreamWriter writer = new System.IO.StreamWriter(path, true))

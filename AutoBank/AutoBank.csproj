@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" />
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props" Condition="Exists('..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
@@ -170,6 +171,9 @@
     <Reference Include="Microsoft.Win32.Registry, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Win32.Registry.4.5.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=3.11.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.11.0\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
@@ -338,7 +342,6 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -347,6 +350,14 @@
     <Compile Include="Migrations\201811022353037_OptmisticConcurr.cs" />
     <Compile Include="Migrations\201811022353037_OptmisticConcurr.Designer.cs">
       <DependentUpon>201811022353037_OptmisticConcurr.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811030252555_ModifiedAccNoToInt.cs" />
+    <Compile Include="Migrations\201811030252555_ModifiedAccNoToInt.Designer.cs">
+      <DependentUpon>201811030252555_ModifiedAccNoToInt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201811030258076_ModifiedAccNoToLongForAccountNumber.cs" />
+    <Compile Include="Migrations\201811030258076_ModifiedAccNoToLongForAccountNumber.Designer.cs">
+      <DependentUpon>201811030258076_ModifiedAccNoToLongForAccountNumber.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountRequest.cs" />
@@ -357,6 +368,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
+    <Content Include="Content\autobank.js" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="favicon.ico" />
@@ -409,6 +421,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Logs\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -426,6 +439,12 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201811022353037_OptmisticConcurr.resx">
       <DependentUpon>201811022353037_OptmisticConcurr.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811030252555_ModifiedAccNoToInt.resx">
+      <DependentUpon>201811030252555_ModifiedAccNoToInt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201811030258076_ModifiedAccNoToLongForAccountNumber.resx">
+      <DependentUpon>201811030258076_ModifiedAccNoToLongForAccountNumber.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
@@ -462,6 +481,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.2.4.0\build\Microsoft.Net.Compilers.props'))" />
     <Error Condition="!Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.8\build\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
+    <Error Condition="!Exists('..\packages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.11.0\build\NUnit.props'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

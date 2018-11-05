@@ -9,7 +9,7 @@ namespace Autobank.Models
 
     public class AccountResponse
     {
-        public int AccountNumber { get; internal set; }
+        public long AccountNumber { get; internal set; }
         public bool Successful { get; set; }
         public decimal Balance { get; set; }
         public string Currency { get; set; }

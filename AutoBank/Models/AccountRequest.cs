@@ -9,8 +9,13 @@ namespace Autobank.Models
 
     public class AccountRequest
     {
-        public int AccountNumber { get; set; }
+        [Required]
+        public long AccountNumber { get; set; }
+
+        [Required]
         public decimal Amount { get; set; }
+
+        [Required]
         public string Currency { get; set; }
     }
 }

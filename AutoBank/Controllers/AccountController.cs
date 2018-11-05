@@ -22,19 +22,27 @@ namespace Autobank.Controllers
     public class AccountController : ApiController
     {
         private ApplicationDbContext db = new ApplicationDbContext("DBConnectionString");
+        LogWriter logwriter = new LogWriter();
 
         [System.Web.Http.HttpGet]
         [ResponseType(typeof(AccountResponse))]
-        [System.Web.Http.Route("balance/{accountNumber}")]
-        public IHttpActionResult Balance(int accountNumber)
+        //[System.Web.Http.Route("balance/{accountNumber}")]
+        [System.Web.Http.Route("balance")]
+        public IHttpActionResult Balance([FromUri] long accountNumber = -1)
         {
+        
+            if (!this.ModelState.IsValid || accountNumber == -1)
+            {
+                ModelState.AddModelError("CorrectionTip", "/?AccountNumber={AccountNumber:Integer}");
+                return this.BadRequest(this.ModelState);
+            }
 
             try
             {
                 var accountDetails = db.Account.Where(a => a.AccountNumber == accountNumber).FirstOrDefault();
                 if (accountDetails == null)
                 {
-                    throw new AccountException("Invalid Account Number");
+                    throw new AccountException("Account number " + accountNumber + " does not exist.");
                 }
 
                 AccountResponse response = new AccountResponse
@@ -70,96 +78,141 @@ namespace Autobank.Controllers
 
         [System.Web.Http.HttpPost]
         [ResponseType(typeof(AccountResponse))]
-        public IHttpActionResult Deposit(AccountRequest accountData)
+        [System.Web.Http.Route("deposit")]
+        public async Task<IHttpActionResult> Deposit([FromBody]AccountRequest accountData)
         {
-
-            AccountModel accountDetails = db.Account.Where(a => a.AccountNumber == accountData.AccountNumber).FirstOrDefault();
-            try
-            {                
-                if (accountDetails == null)
-                {
-                    throw new AccountException("Invalid Account Number");
-                }
-                AccountResponse resp = accountDetails.Deposit(accountData);
-                AccountResponse response = new AccountResponse
-                {
-                    AccountNumber = accountDetails.AccountNumber,
-                    Successful = true,
-                    Balance = accountDetails.Balance,
-                    Currency = accountDetails.Currency,
-                    Message = "Account Details Retrieved Successfully."
-                };
-
-                return Ok(response);
-
-            }
-            catch (AccountException ae)
+            if (!this.ModelState.IsValid)
             {
-
-                AccountResponse response = new AccountResponse
-                {
-                    AccountNumber = accountData.AccountNumber,
-                    Successful = false,
-                    Message = ae.Message
-                };
-
-                return Ok(response);
+                ModelState.AddModelError("CorrectionTip", "AccountNumber:Integer, Amount:Integer, Currency:Sting(3)");
+                return this.BadRequest(this.ModelState);
             }
-            catch (Exception ex)
+            using (db) { 
+                AccountModel accountDetails = await db.Account.Where(a => a.AccountNumber == accountData.AccountNumber && a.Currency == accountData.Currency).FirstOrDefaultAsync();            
+                bool failedSave;
+                do{
+                    failedSave = false;
+                    try
+                    {
+                        if (accountDetails == null)
+                        {
+                            throw new AccountException("Account with number " + accountData.AccountNumber + " and Currency denomination: " + accountData.Currency.ToUpper() + " does not exist");
+                        }
+                        logwriter.WriteTolog("Before Deposit, Balance is " + accountDetails.Balance + ". Account Number: " + accountDetails.AccountNumber + ". Account Currency: " + accountDetails.Currency);
+                        accountDetails.Deposit(accountData.Amount);
+                        await db.SaveChangesAsync();
+                        logwriter.WriteTolog("After Deposit, Balance is " + accountDetails.Balance + ". Account Number: " + accountDetails.AccountNumber + ". Account Currency: " + accountDetails.Currency);
+                        AccountResponse response = new AccountResponse
+                        {
+                            AccountNumber = accountDetails.AccountNumber,
+                            Successful = true,
+                            Balance = accountDetails.Balance,
+                            Currency = accountDetails.Currency,
+                            Message = "Account Details <i style='color:limegreen;font-weight:bolder'> Credited </i> Successfully."
+                        };
+                        return Ok(response);
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        failedSave = true;
+                        var dataentry = ex.Entries.Single();
+                        var dbEntry = dataentry.GetDatabaseValues();
+                        //Perhaps account details has been deleted.
+                        if (dbEntry == null)
+                        {
+                            throw new AccountException("Details for Account number " + accountDetails.AccountNumber + " does not exist.");
+                        }
+                        //replace the model with refresh data from the database
+                        dataentry.OriginalValues.SetValues(dbEntry);
+                        logwriter.WriteTolog("Account Balance has changed. Database Concurrency Occured  on Deposit");
+                    }
+                    catch (AccountException ae)
+                    {
+                        AccountResponse response = new AccountResponse
+                        {
+                            AccountNumber = accountData.AccountNumber,
+                            Successful = false,
+                            Message = ae.Message
+                        };
+                        return Ok(response);
+                    }
+                    catch (Exception ex)
+                    {
+                        return InternalServerError();
+                    }                
+                } while (failedSave);
+
+                return Ok();
+            }
+        }        
+
+        [System.Web.Http.HttpPost]
+        [ResponseType(typeof(AccountResponse))]
+        [System.Web.Http.Route("withdraw")]
+        public async Task<IHttpActionResult> Withdraw([FromBody]AccountRequest accountData)
+        {
+            if (!this.ModelState.IsValid)
             {
-                return InternalServerError();
+                ModelState.AddModelError("CorrectionTip", "AccountNumber:Integer, Amount:Integer, Currency:Sting(3)");
+                return this.BadRequest(this.ModelState);
             }
+            using (db) { 
+                AccountModel accountDetails = await db.Account.Where(a => a.AccountNumber == accountData.AccountNumber && a.Currency == accountData.Currency).FirstOrDefaultAsync();            
+                bool failedSave;
+                do{
+                    failedSave = false;
+                    try
+                    {
+                        if (accountDetails == null)
+                        {
+                            throw new AccountException("Account with number " + accountData.AccountNumber + " and Currency denomination: " + accountData.Currency.ToUpper() + " does not exist");
+                        }
+                        logwriter.WriteTolog("Before Withdrawal, Balance is " + accountDetails.Balance + ". Account Number: " + accountDetails.AccountNumber + ". Account Currency: " + accountDetails.Currency);
+                        accountDetails.Withdraw(accountData.Amount);
+                        await db.SaveChangesAsync();
+                        AccountResponse response = new AccountResponse
+                        {
+                            AccountNumber = accountDetails.AccountNumber,
+                            Successful = accountDetails.wasWithdrawn ? true:false,
+                            Balance = accountDetails.Balance,
+                            Currency = accountDetails.Currency,
+                            Message = accountDetails.wasWithdrawn ? "Account Details has been  <i style='color:red;font-weight:bolder'> Debited </i> Successfully." : "Account cannot be debited, Cash overdraw not allowed!<br/> Attempted to withdraw: " +accountData.Amount + accountData.Currency.ToUpper()
+                        };
+                        logwriter.WriteTolog("After Withdrawal, Balance is " + accountDetails.Balance + ". Account Number: " + accountDetails.AccountNumber + ". Account Currency: " + accountDetails.Currency);
+                        return Ok(response);
+                    }
+                    catch (DbUpdateConcurrencyException ex)
+                    {
+                        failedSave = true;
+                        var dataentry = ex.Entries.Single();
+                        var dbEntry = dataentry.GetDatabaseValues();
+                        //Perhaps account details has been deleted.
+                        if (dbEntry == null)
+                        {
+                            throw new AccountException("Details for Account number " + accountDetails.AccountNumber + " does not exist.");
+                        }
+                        //replace the model with refresh data from the database
+                        dataentry.OriginalValues.SetValues(dbEntry);
+                        logwriter.WriteTolog("Account Balance has changed. Database Concurrency Occured");
+                    }
+                    catch (AccountException ae)
+                    {
+                        AccountResponse response = new AccountResponse
+                        {
+                            AccountNumber = accountData.AccountNumber,
+                            Successful = false,
+                            Message = ae.Message
+                        };
+                        return Ok(response);
+                    }
+                    catch (Exception ex)
+                    {
+                        return InternalServerError();
+                    }                
+                } while (failedSave);
 
-        }
-
-        //[HttpPost]
-        //[ResponseType(typeof(void))]
-        //public async Task<IHttpActionResult> Withdraw([FromBody] AccountDto accountDto)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(ModelState);
-        //    }
-
-        //    if (id != accountDto.Id)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    db.Entry(accountDto).State = System.Data.Entity.EntityState.Modified;
-
-        //    try
-        //    {
-        //        await db.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!AccountModelExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return StatusCode(HttpStatusCode.NoContent);
-        //}        
-
-        //protected override void Dispose(bool disposing)
-        //{
-        //    if (disposing)
-        //    {
-        //        db.Dispose();
-        //    }
-        //    base.Dispose(disposing);
-        //}
-
-        //private bool AccountModelExists(int accountNumber)
-        //{
-        //    return db.Account.Count(e => e.AccountNumber == accountNumber) > 0;
-        //}
+                return Ok();
+            }
+        }                
 
     }
 }

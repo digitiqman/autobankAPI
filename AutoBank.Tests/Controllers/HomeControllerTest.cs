@@ -11,15 +11,11 @@ namespace AutoBank.Tests.Controllers
         [TestMethod]
         public void Index()
         {
-            // Arrange
+            //Test the Landing Page of the AutoBanking App
             HomeController controller = new HomeController();
-
-            // Act
             ViewResult result = controller.Index() as ViewResult;
-
-            // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual("Home Page", result.ViewBag.Title);
+            Assert.AreEqual("Chilindo AutoBank", result.ViewBag.Title);
         }
     }
 }

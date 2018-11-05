@@ -13,7 +13,8 @@ namespace AutoBank.Models
     public class AccountModel
     {
 
-        private ApplicationDbContext db = new ApplicationDbContext("DBConnectionString"); 
+        private ApplicationDbContext db = new ApplicationDbContext("DBConnectionString");
+        public bool wasWithdrawn;
 
         [Key]
         public int Id { get; set; }
@@ -23,7 +24,7 @@ namespace AutoBank.Models
 
         [Required]
         [Index("uniqaccountnumber", IsUnique = true)]
-        public int AccountNumber{ get; set; }
+        public long AccountNumber{ get; set; }
 
         [Required]
         [ConcurrencyCheck]
@@ -37,57 +38,18 @@ namespace AutoBank.Models
         [Timestamp]
         public byte[] RowVersion { get; set; }
 
-        public AccountResponse Deposit(AccountRequest account)
+        public void Deposit(decimal amount)
         {
-            //try
-            //{
+            this.Balance += amount;
+        }
 
-            //    AccountResponse resp = accountDetails.Deposit(accountData);
-            //    AccountResponse response = new AccountResponse
-            //    {
-            //        AccountNumber = accountDetails.AccountNumber,
-            //        Successful = true,
-            //        Balance = accountDetails.Balance,
-            //        Currency = accountDetails.Currency,
-            //        Message = "Account Details Retrieved Successfully."
-            //    };
-            //    return resp;
-
-            //}
-            //catch (AccountException ae)
-            //{
-
-            //    AccountResponse response = new AccountResponse
-            //    {
-            //        AccountNumber = account.AccountNumber,
-            //        Successful = false,
-            //        Message = ae.Message
-            //    };
-            //    return response;
-            //}
-            //catch (Exception ex)
-            //{
-
-            //    AccountResponse response = new AccountResponse
-            //    {
-            //        AccountNumber = account.AccountNumber,
-            //        Successful = false,
-            //        Message = ex.Message
-            //    };
-            //    return response;
-            //}
-
-
-
-            AccountResponse response = new AccountResponse
-            {
-                AccountNumber = account.AccountNumber,
-                Successful = false,
-                Message = "sasadasdasd"
-            };
-            return response;
-
-
+        public void Withdraw(decimal amount)
+        {
+            wasWithdrawn = false;
+            if (this.Balance < amount)
+                return;
+            this.Balance -= amount;
+            wasWithdrawn = true;
         }
 
     }

@@ -1,24 +1,76 @@
 ﻿<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS, and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    <h1>Chilindo AutoBank</h1>
+    <p class="lead">Chilindo is trialling an automated banking feature to evaluate whether
+    it can be better handled by building internally. The first step is to implement a simple 
+    transaction processing framework. The framework will receive input via a Web Api and process 
+    those requests based on some simple rules. This should be backed by MSSQL.</p>
 </div>
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>ASP.NET Web API is a framework that makes it easy to build HTTP services that reach
-        a broad range of clients, including browsers and mobile devices. ASP.NET Web API
-        is an ideal platform for building RESTful applications on the .NET Framework.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301870">Learn more &raquo;</a></p>
+    <h2>Chilindo AutoBanking Application</h2>
+    <form class="form" action="#" id="autobankform" style="text-align:center;">
+        <h2>Transaction Form</h2>
+        <div id="alertarea">
+        </div>
+        <label>Account Number :</label>
+        <select id="AccountNumber" name="AccountNumber">
+            <option value="10929292920">Wrong Account Number (10929292920)</option>
+            @foreach (var account in ViewBag.AllAccounts)
+            {
+                <option value="@account.AccountNumber">@account.AccountNumber</option>
+            }
+        </select>
+        <label>Currency :</label>
+        <select name="Currency" id="Currency" name="Currency">
+            <option value="qqq">Invalid Currency (qqq)</option>
+            <option value="thb">Thai Badt (thb)</option>
+            <option value="usd"> US Dollars (usd)</option>
+            <option value="ngn"> Nigerian Naira (ngn)</option>
+            <option value="eur"> EU Euros (eur)</option>c
+            <option value="sgd"> Singapore Dollar (sgd)</option>
+            <option value="gbp"> Great Britain Pounds (gbp)</option>
+        </select>
+        <label> Amount</label>
+        <input type="text" name="Amount" id="Amount"/>
+
+    </form>
+    <div></div>
+    <div class="row" style="padding:10px;">
+        <div class="col-md-12">
+            <button id="balance" class="btn btn-block btn-default" title="Select a Valid/Invalid Account and Click this button to check Account Balance">CHECK BALANCE</button>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301871">Learn more &raquo;</a></p>
+    <div class="col-md-6">
+        <button id ="deposit" class="transact btn btn-block btn-success" title="Select a Valid/Invalid Account and Click this button to Deposit.">DEPOSIT</button>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301872">Learn more &raquo;</a></p>
+    <div class="col-md-6">
+        <button id="withdraw" class="transact btn btn-block btn-danger" title="Select a Valid/Invalid Account and Click this button to Withdraw">WITHDRAW</button>
     </div>
+</div>
+<div class="row" style="padding-top:10px;">
+    <div class="col-md-12">
+        <button id="throttle" class="btn btn-block btn-warning" title="Select a valid Account and Click this Button. This would send parallel
+         multiple random account posting to the server. TIP: Choose an account with 
+         little account balance to show the concurrency to avoid negative balance. ">THROTTLE</button>
+    </div>
+</div>
+<div class="row">
+    <h4 style="color:red;">Tip: Valid Accounts</h4>
+    <table style="width:100%;">
+        <thead>
+        <th>Account Name</th>
+        <th>Account Number</th>
+        <th>Currency</th>
+        </thead>
+        <tbody>
+            @foreach (var account in ViewBag.AllAccounts)
+            {
+                <tr>
+                    <td>@account.AccountName</td>
+                    <th>@account.AccountNumber</th>
+                    <th>@account.Currency</th>
+                </tr>
+            }
+        </tbody>
+
+    </table>
 </div>
