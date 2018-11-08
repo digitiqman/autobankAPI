@@ -17,5 +17,6 @@ namespace Autobank.Models
 
         [Required]
         public string Currency { get; set; }
+        
     }
 }

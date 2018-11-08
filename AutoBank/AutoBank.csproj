@@ -360,6 +360,7 @@
       <DependentUpon>201811030258076_ModifiedAccNoToLongForAccountNumber.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\BadAccountRequest.cs" />
     <Compile Include="Models\AccountRequest.cs" />
     <Compile Include="Models\AccountResponse.cs" />
     <Compile Include="Models\AccountModel.cs" />

@@ -152,7 +152,7 @@ namespace Autobank.Controllers
         {
             if (!this.ModelState.IsValid)
             {
-                ModelState.AddModelError("CorrectionTip", "AccountNumber:Integer, Amount:Integer, Currency:Sting(3)");
+                ModelState.AddModelError("CorrectionTip", "AccountNumber:Integer, Amount:Integer, Currency:String(3)");
                 return this.BadRequest(this.ModelState);
             }
             using (db) { 
@@ -175,7 +175,7 @@ namespace Autobank.Controllers
                             Successful = accountDetails.wasWithdrawn ? true:false,
                             Balance = accountDetails.Balance,
                             Currency = accountDetails.Currency,
-                            Message = accountDetails.wasWithdrawn ? "Account Details has been  <i style='color:red;font-weight:bolder'> Debited </i> Successfully." : "Account cannot be debited, Cash overdraw not allowed!<br/> Attempted to withdraw: " +accountData.Amount + accountData.Currency.ToUpper()
+                            Message = accountDetails.wasWithdrawn ? "Account Details has been <i style='color:red;font-weight:bolder'> Debited </i> Successfully." : "Account cannot be debited, Cash overdraw not allowed!<br/> Attempted to withdraw: " + accountData.Amount + accountData.Currency.ToUpper()
                         };
                         logwriter.WriteTolog("After Withdrawal, Balance is " + accountDetails.Balance + ". Account Number: " + accountDetails.AccountNumber + ". Account Currency: " + accountDetails.Currency);
                         return Ok(response);
